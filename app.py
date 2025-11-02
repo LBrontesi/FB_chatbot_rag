@@ -59,6 +59,55 @@ def load_models():
         st.info("Make sure you have run `python preprocess.py` first to create the vectorstore")
         return None, None
 
+def process_uploaded_file(uploaded_file, collection, embedding_model):
+    """Process and add uploaded file to vector database"""
+    try:
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=Path(uploaded_file.name).suffix) as tmp_file:
+            tmp_file.write(uploaded_file.getvalue())
+            tmp_file_path = tmp_file.name
+        
+        # Load document based on file type
+        if uploaded_file.name.endswith('.pdf'):
+            loader = PyPDFLoader(tmp_file_path)
+        elif uploaded_file.name.endswith('.txt'):
+            loader = TextLoader(tmp_file_path, encoding='utf-8')
+        else:
+            os.unlink(tmp_file_path)
+            return False, "Unsupported file type. Please upload PDF or TXT files."
+        
+        # Load and split
+        documents = loader.load()
+        
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len,
+        )
+        chunks = text_splitter.split_documents(documents)
+        
+        # Add to ChromaDB
+        for i, chunk in enumerate(chunks):
+            embedding = embedding_model.encode([chunk.page_content])[0].tolist()
+            
+            collection.add(
+                ids=[f"{uploaded_file.name}_{i}"],
+                embeddings=[embedding],
+                documents=[chunk.page_content],
+                metadatas=[{"source": uploaded_file.name, "chunk": i}]
+            )
+        
+        # Clean up
+        os.unlink(tmp_file_path)
+        
+        return True, f"Successfully added {len(chunks)} chunks from {uploaded_file.name}"
+    
+    except Exception as e:
+        if 'tmp_file_path' in locals():
+            os.unlink(tmp_file_path)
+        return False, f"Error processing file: {str(e)}"
+
+
 def retrieve_context(query: str, collection, embedding_model, n_results: int = 3):
     """Retrieve the most relevant chunks"""
     try:
@@ -164,9 +213,35 @@ def main():
                 st.stop()
             else:
                 st.success("✅ API Key configured")
-            st.markdown("---")
+            
+        st.markdown("---")
+        # File Upload Section
+        st.header("📤 Upload Documents")
+        uploaded_file = st.file_uploader(
+            "Upload PDF or TXT file",
+            type=['pdf', 'txt'],
+            help="Upload course notes to add to the knowledge base"
+        )
         
+        if uploaded_file is not None:
+            if st.button("➕ Add to Knowledge Base", type="primary"):
+                # Load models first
+                embedding_model, collection, _ = load_models()
+                
+                if embedding_model and collection:
+                    with st.spinner(f"Processing {uploaded_file.name}..."):
+                        success, message = process_uploaded_file(uploaded_file, collection, embedding_model)
+                    
+                    if success:
+                        st.success(message)
+                        # Force reload of models to refresh collection
+                        st.cache_resource.clear()
+                    else:
+                        st.error(message)
+                else:
+                    st.error("Cannot load models")
         
+        st.markdown("---")
         st.markdown("### 📚 Info")
         st.markdown("""
         This chatbot uses:

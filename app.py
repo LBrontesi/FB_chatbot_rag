@@ -113,7 +113,7 @@ ANSWER:"""
 
 def main():
     # Header
-    st.markdown("<h1 class='main-header'>🎓 Course Notes Chatbot</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-header'>🎓 Finance & Banking Notes Chatbot</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: gray;'>Ask questions about your notes using RAG</p>", unsafe_allow_html=True)
     
     # Initialize session state
@@ -125,15 +125,21 @@ def main():
     
     # Sidebar for API key
     with st.sidebar:
-        st.header("⚙️ Configuration")
+        
+        st.markdown("### 👥 Contributors")
+        st.markdown("""
+        - Lorenzo Brontesi
+        - Francesco Ansanelli
+        """)
         
         # Try to get API key from secrets first
         groq_api_key = None
         
         if "GROQ_API_KEY" in st.secrets:
             groq_api_key = st.secrets["GROQ_API_KEY"]
-            st.success("✅ API Key loaded from secrets")
+            #st.success("✅ API Key loaded from secrets")
         else:
+            st.header("⚙️ Configuration")
             # If not in secrets, ask user to input
             st.info("💡 **Tip**: Add your key to `.streamlit/secrets.toml` to avoid typing it every time")
             
@@ -154,8 +160,9 @@ def main():
                 st.stop()
             else:
                 st.success("✅ API Key configured")
+            st.markdown("---")
         
-        st.markdown("---")
+        
         st.markdown("### 📚 Info")
         st.markdown("""
         This chatbot uses:

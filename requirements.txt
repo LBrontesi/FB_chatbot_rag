@@ -5,4 +5,5 @@ groq==0.4.1
 torch>=2.9.0
 transformers==4.36.2
 numpy>=1.25.0
+huggingface_hub==0.16.4
 

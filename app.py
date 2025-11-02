@@ -3,6 +3,10 @@ RAG Chatbot for university notes
 Deploy on Streamlit Cloud with Groq API
 """
 
+import os
+# Disable tokenizers parallelism warning
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import streamlit as st
 
 # Page configuration - MUST be first Streamlit command

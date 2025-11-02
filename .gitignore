@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local data - NON commitare gli appunti originali
+data/appunti/*
+
+# Ma COMMITTARE il vectorstore (necessario per Streamlit Cloud)
+# vectorstore/ <- NON aggiungere qui!
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
+*.log

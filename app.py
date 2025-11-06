@@ -147,6 +147,7 @@ INSTRUCTIONS:
 - If the answer is not in the context, say so honestly
 - Use examples from the context when possible
 - Do not make up information
+- If the user greets you, greet back and ask how can you help 
 
 ANSWER:"""
 

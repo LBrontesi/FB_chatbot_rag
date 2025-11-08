@@ -19,7 +19,7 @@ ENV/
 Thumbs.db
 
 # Local data - NON commitare gli appunti originali
-data/appunti/*
+raw_inputs/*
 
 # Ma COMMITTARE il vectorstore (necessario per Streamlit Cloud)
 # vectorstore/ <- NON aggiungere qui!
@@ -29,3 +29,9 @@ data/appunti/*
 
 # Logs
 *.log
+
+#download code for google drive
+downloader_drive.py
+
+#auth for google drive
+client_secrets.json
